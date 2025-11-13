@@ -198,13 +198,14 @@ def DFS(state: Board) -> Board:
             return current_board
         if not current_board.failure_test():
             row, col = current_board.find_most_constrained_cell()
-            print(row, col)
+            # print(row, col)
             possible_values = current_board.rows[row][col]
-            print(possible_values)
+            # print(possible_values)
             for val in possible_values:
                 new_board: Board = copy.deepcopy(current_board)
                 new_board.update(row, col, val)
                 the_stack.push(new_board)
+    return None
 
 def BFS(state: Board) -> Board:
     """Performs a breadth first search. Takes a Board and attempts to assign values to
