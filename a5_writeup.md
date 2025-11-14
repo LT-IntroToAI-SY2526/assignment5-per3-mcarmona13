@@ -23,10 +23,13 @@ After completing the assignment, answer the following reflection questions:
 
 1. What are some things that you learned through this assignment? Think about the concepts of backtracking, constraint satisfaction, and search algorithms. Were there any particular challenges you faced while implementing the Board class methods or the DFS/BFS functions? How did you overcome them?
 
+I learned how backtracking works by tryng different numbers & going back when I hit dead end. The hardest part was keeping track of the nested lists and remembering to copy the board before making changes, otherwise all of my boards would get mixed up. I also learned that choosing the cell with the fewest options first makes solving faster. 
 
 
 2. How can you apply what you learned in this assignment to future programs or projects? Consider other types of problems that involve searching through possibilities, making decisions, and backtracking when those decisions don't work out. Can you think of real-world scenarios where DFS or BFS might be useful? What about other constraint satisfaction problems?
 
-
+These ideas could help solve problems like creating class schedules without time conflicts or planning routes through a maze. DFS goes deep into one option before trying others, which is good for quickly finding any answer, while BFS checks all nearby options first, which finds the shortest path. I could use these things like solving other puzzles, planning trips, or organizing tasks with dependencies. 
 
 3. Explain how the Stack and Queue classes work and why they are important for DFS and BFS algorithms. Describe the difference between LIFO (Last In First Out) and FIFO (First In First Out) data structures. How does using a Stack versus a Queue change the way the search algorithm explores possible solutions? Why is one data structure better suited for depth-first search and the other for breadth-first search?
+
+A stack works like a pile of plates where you only add or take from the top(last thing in, is the 1st thin out), while a queue works like a line where you join the back & leave form the front(first thing in, is 1st thing out). DFS uses a stack so it explores older possibilities first & spreads out even;y. The data structure you pick completely changes which path get explored first.
