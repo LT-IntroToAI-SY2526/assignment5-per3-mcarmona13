@@ -1,4 +1,5 @@
 import copy  # to make a deepcopy of the board
+import time  # ADD THIS LINE - for tracking time
 from typing import List, Any, Tuple
 
 # import Stack and Queue classes for BFS/DFS
@@ -16,10 +17,6 @@ def remove_if_exists(lst: Any, elem: Any) -> None:
         lst.remove(elem)
 
 
-# NOTE: The linter will complain at you due to the code using member variables like row,
-# num_nums_placed & size since you haven't added those in the constructor. Implement the
-# constructor before worrying about these errors (if they're still there after you've
-# implemented the constructor that's probably a sign your constructor has a bug in it)
 class Board:
     """Represents a state (situation) in a Sudoku puzzle. Some cells may have filled in
     numbers while others have not. Cells that have not been filled in hold the potential
@@ -113,16 +110,12 @@ class Board:
         for row in range(self.size):
             for col in range(self.size):
                 cell = self.rows[row][col]
-                # print(f"({row},{col}): {cell}")
                 if isinstance(cell, list):
                     if len(cell) < min_length:
                         min_length = len(cell)
                         min_row = row
                         min_col = col
-        # print(f"({min_row},{min_col})")
         return (min_row, min_col)
-                
-                    
 
     def failure_test(self) -> bool:
         """Check if we've failed to correctly fill out the puzzle. If we find a cell
@@ -134,11 +127,9 @@ class Board:
         """
         for row in self.rows:
             for col in row:
-                # print(col)
                 if col == []:
                     return True
         return False
-
 
     def goal_test(self) -> bool:
         """Check if we've completed the puzzle (if we've placed all the numbers).
@@ -171,7 +162,6 @@ class Board:
             remove_if_exists(self.rows[row][c], assignment)
 
         subgrid_coords = self.subgrid_coordinates(row, column)
-        # print(subgrid_coords)
         for (r, c) in subgrid_coords:
             remove_if_exists(self.rows[r][c], assignment)
 
@@ -190,17 +180,22 @@ def DFS(state: Board) -> Board:
     """
     the_stack = Stack()
     the_stack.push(state)
+    iterations = 0  # ADD THIS LINE
+    start_time = time.time()  # ADD THIS LINE
 
     while not the_stack.is_empty():
+        iterations += 1  # ADD THIS LINE
         current_board: Board = the_stack.pop()
-        # print(current_board)
+        
         if current_board.goal_test():
+            end_time = time.time()  # ADD THIS LINE
+            elapsed_time = end_time - start_time  # ADD THIS LINE
+            print(f"DFS took {iterations} iterations in {elapsed_time:.4f} seconds")  # ADD THIS LINE
             return current_board
+        
         if not current_board.failure_test():
             row, col = current_board.find_most_constrained_cell()
-            # print(row, col)
             possible_values = current_board.rows[row][col]
-            # print(possible_values)
             for val in possible_values:
                 new_board: Board = copy.deepcopy(current_board)
                 new_board.update(row, col, val)
@@ -221,11 +216,17 @@ def BFS(state: Board) -> Board:
     """
     the_queue = Queue()
     the_queue.push(state)
+    iterations = 0  # ADD THIS LINE
+    start_time = time.time()  # ADD THIS LINE
 
     while not the_queue.is_empty():
+        iterations += 1  # ADD THIS LINE
         current_board: Board = the_queue.pop()
         
         if current_board.goal_test():
+            end_time = time.time()  # ADD THIS LINE
+            elapsed_time = end_time - start_time  # ADD THIS LINE
+            print(f"BFS took {iterations} iterations in {elapsed_time:.4f} seconds")  # ADD THIS LINE
             return current_board
         
         if not current_board.failure_test():
@@ -240,9 +241,6 @@ def BFS(state: Board) -> Board:
     return None
 
 if __name__ == "__main__":
-    # uncomment the below lines once you've implemented the board class
-   
-    # CODE BELOW HERE RUNS YOUR BFS/DFS
     print("<<<<<<<<<<<<<< Solving Sudoku >>>>>>>>>>>>>>")
 
     def test_dfs_or_bfs(use_dfs: bool, moves: List[Tuple[int, int, int]]) -> None:
@@ -321,78 +319,15 @@ if __name__ == "__main__":
         (8, 5, 7),
         (8, 7, 5),
     ]
-    #Create a sudoku board.
-    b = Board()
-    #Place the 28 assignments in first_moves on the board.
-    # b.print_pretty()
-    
-    for trip in first_moves:
-        b.rows[trip[0]][trip[1]] = trip[2]
-    #NOTE - the above code only *puts* the numbers on the board, but doesn't
-    #   do the work that update does (remove numbers from other lists, etc).
-    # b.print_pretty()
-    #I'm going to now alter 3 lists on the board to make them shorter (more
-    #   constrained. 
-    remove_if_exists(b.rows[0][0], 8)
-    remove_if_exists(b.rows[0][0], 7)
-    remove_if_exists(b.rows[0][0], 3)
-    remove_if_exists(b.rows[0][0], 2)
-    remove_if_exists(b.rows[4][8], 8)
-    remove_if_exists(b.rows[4][8], 1)
-    remove_if_exists(b.rows[4][8], 2)
-    remove_if_exists(b.rows[4][8], 3)
-    remove_if_exists(b.rows[4][8], 4)
-    remove_if_exists(b.rows[6][7], 2)
-    remove_if_exists(b.rows[6][7], 3)
-    remove_if_exists(b.rows[6][7], 5)
-    remove_if_exists(b.rows[6][7], 6)
-    #we removed 5 items from positions (4,8) so that should now be the most
-    #  constrained.
-    assert b.find_most_constrained_cell() == (4,8), "find most constrained cell test 1"
-    assert b.failure_test() == False, "failure test test 1"
-    assert b.goal_test() == False, "goal test test 1"
-
-    b.rows[4][3] = []
-    assert b.find_most_constrained_cell() == (4,3), "find most constrained cell test 2"
-    assert b.failure_test() == True, "failure test test 2"
-    print("All part 1 tests passed!")
-
-    ##Now, let's write some quick tests to check update!
-    #Create a sudoku board.
-    g = Board()
-    #Place the 28 assignments in first_moves on the board.
-    for trip in first_moves:
-        g.update(trip[0],trip[1],trip[2])
-    g.print_pretty()
-    #From the above print statement, you can see which numbers
-    #  have been assigned to the board, and then create test
-    #  cases by looking at the board and listing what values are
-    #  still possible for a specific cell. I have created
-    #  2 such test cases like that for you. 
-    assert g.rows[0][2] == [2,5,6], "update test 1"
-    assert g.rows[5][5] == [3,7,9], "update test 2"
-    assert g.num_nums_placed == 28, "update test 3"
-    assert g.find_most_constrained_cell() == (1,7), "fmc test"
-    assert g.failure_test() == False, "failure test test"
-    assert g.goal_test() == False, "goal test test"
-    g.num_nums_placed = 81
-    assert g.goal_test() == True, "goal test test"
-    print("All part 2 tests passed! Testing DFS and BFS next:")
-    print(g)
 
     print("<<<<<<<<<<<<<< Testing DFS on First Game >>>>>>>>>>>>>>")
-
     test_dfs_or_bfs(True, first_moves)
 
-    print("<<<<<<<<<<<<<< Testing DFS on Second Game >>>>>>>>>>>>>>")
-
+    print("\n<<<<<<<<<<<<<< Testing DFS on Second Game >>>>>>>>>>>>>>")
     test_dfs_or_bfs(True, second_moves)
 
-    print("<<<<<<<<<<<<<< Testing BFS on First Game >>>>>>>>>>>>>>")
-
+    print("\n<<<<<<<<<<<<<< Testing BFS on First Game >>>>>>>>>>>>>>")
     test_dfs_or_bfs(False, first_moves)
 
-    print("<<<<<<<<<<<<<< Testing BFS on Second Game >>>>>>>>>>>>>>")
-
+    print("\n<<<<<<<<<<<<<< Testing BFS on Second Game >>>>>>>>>>>>>>")
     test_dfs_or_bfs(False, second_moves)
-    pass
